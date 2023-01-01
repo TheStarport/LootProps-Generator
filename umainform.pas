@@ -5,14 +5,21 @@ unit UMainForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Spin, SpinEx;
 
 type
   TMainForm = class(TForm)
-    SaveDialog: TSaveDialog;
+    CreateLootpropsButton: TButton;
+    ProbabilityInputLabel: TLabel;
+    SelectDirectoryButton: TButton;
+    SelectedDirectoryPathLabel: TLabel;
+    ProbabilityInput: TFloatSpinEditEx;
+    SaveLootpropsDialog: TSaveDialog;
     WarningsListBox: TListBox;
     SelectDirectoryDialog: TSelectDirectoryDialog;
+    procedure CreateLootpropsButtonClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure SelectDirectoryButtonClick(Sender: TObject);
   private
 
   public
@@ -120,12 +127,29 @@ end;
     count = max2
 }
 
-procedure CreateLootProp(Name: String; Chance: Uint8; Min: Uint16; MaxForChance: Uint16; MaxToDrop: Uint16; constref StringList: TStringList);
+procedure CreateLootProp(Name: String; Chance: Single; Min: Uint16; MaxForChance: Uint16; MaxToDrop: Uint16; constref StringList: TStringList);
+var
+  FormatSettings: TFormatSettings;
 begin
+  FormatSettings.DecimalSeparator := '.';
   StringList.Append('[mLootProps]');
   StringList.Append('nickname = ' + Name);
-  StringList.Append('drop_properties = ' + IntToStr(Math.Min(Chance, 100)) + ', 0, 1, ' + IntToStr(Min) + ', ' + IntToStr(MaxForChance) + ', ' + IntToStr(MaxToDrop));
+  StringList.Append('drop_properties = ' + FormatFloat('0.######', Math.Min(Chance, 100), FormatSettings) + ', 0, 1, ' + IntToStr(Min) + ', ' + IntToStr(MaxForChance) + ', ' + IntToStr(MaxToDrop));
   StringList.Append('');
+end;
+
+function HasLootableKey(constref Section: TStringList): Boolean;
+var
+  Index: ValSInt;
+  Line: String;
+begin
+  for Index := 0 to Section.Count - 1 do
+  begin
+    Line := Section.Strings[Index].ToLower;
+    if Line.StartsWith('lootable') then
+      Exit(True);
+  end;
+  Result := False;
 end;
 
 function IsLootable(constref Section: TStringList): Boolean;
@@ -170,7 +194,7 @@ begin
   Result := '';
 end;
 
-function CreateLootProps(constref Sections: TStringsListArray): TStringList;
+function CreateLootProps(constref Sections: TStringsListArray; const Probability: Single): TStringList;
 var
   Index: ValSInt;
   Name: String;
@@ -188,7 +212,7 @@ begin
         'mine': CreateLootProp(Name, 100, 65535, 65535, 65535, Result);
         'countermeasure': CreateLootProp(Name, 100, 65535, 65535, 65535, Result);
         else
-          CreateLootProp(Name, 8, 0, 2, 1, Result);
+          CreateLootProp(Name, Probability, 0, 2, 1, Result);
       end;
     end;
 end;
@@ -200,13 +224,13 @@ var
 begin
   Warnings := TStringList.Create;
   for SectionIndex := 0 to High(Sections) do
-    if not IsLootable(Sections[SectionIndex]) then
-      Warnings.Append(FindNickname(Sections[SectionIndex]) + ' - ' + 'lootable=false or not defined');
+    if not HasLootableKey(Sections[SectionIndex]) then
+      Warnings.Append(FindNickname(Sections[SectionIndex]) + ' - ' + 'lootable not defined');
   MainForm.WarningsListBox.Items.Assign(Warnings);
   Warnings.Free;
 end;
 
-function CreateLootPropsFromIniFiles(const DirectoryPath: String): TStringList;
+function CreateLootPropsFromIniFiles(const DirectoryPath: String; const Probability: Single): TStringList;
 var
   Files: TStringList;
   Index: ValSInt;
@@ -214,7 +238,6 @@ var
   Sections: TStringsListArray;
   OldAllSectionsLength: ValSInt;
   AllSections: TStringsListArray;
-  LootProps: TStringList;
 begin
   Files := FindAllFiles(DirectoryPath, '*.ini', False);
   AllSections := nil;
@@ -234,7 +257,7 @@ begin
   end;
 
   CreateWarnings(AllSections);
-  Result := CreateLootProps(AllSections);
+  Result := CreateLootProps(AllSections, Probability);
 
   for Index := 0 to High(AllSections) do
     AllSections[Index].Free;
@@ -243,13 +266,32 @@ begin
 end;
 
 procedure TMainForm.FormCreate(Sender: TObject);
+begin
+  Self.SelectedDirectoryPathLabel.Caption := '';
+  Self.ProbabilityInputLabel.Enabled := False;
+  Self.ProbabilityInput.Enabled := False;
+  Self.CreateLootpropsButton.Enabled := False;
+end;
+
+procedure TMainForm.SelectDirectoryButtonClick(Sender: TObject);
+begin
+  if SelectDirectoryDialog.Execute then
+  begin
+    Self.SelectedDirectoryPathLabel.Caption := Self.SelectDirectoryDialog.FileName;
+    Self.ProbabilityInputLabel.Enabled := True;
+    Self.ProbabilityInput.Enabled := True;
+    Self.CreateLootpropsButton.Enabled := True;
+  end;
+end;
+
+procedure TMainForm.CreateLootpropsButtonClick(Sender: TObject);
 var
   LootProps: TStringList;
 begin
-  if SelectDirectoryDialog.Execute and SaveDialog.Execute then
+  if Self.SaveLootpropsDialog.Execute then
   begin
-    LootProps := CreateLootPropsFromIniFiles(SelectDirectoryDialog.FileName);
-    LootProps.SaveToFile(SaveDialog.FileName);
+    LootProps := CreateLootPropsFromIniFiles(Self.SelectDirectoryDialog.FileName, Self.ProbabilityInput.Value);
+    LootProps.SaveToFile(Self.SaveLootpropsDialog.FileName);
     LootProps.Free;
   end;
 end;

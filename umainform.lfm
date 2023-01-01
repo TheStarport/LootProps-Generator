@@ -1,33 +1,87 @@
 object MainForm: TMainForm
   Left = 2170
-  Height = 240
+  Height = 526
   Top = 250
-  Width = 320
+  Width = 376
   Caption = 'LootProp Maker'
-  ClientHeight = 240
-  ClientWidth = 320
+  ClientHeight = 526
+  ClientWidth = 376
   OnCreate = FormCreate
   LCLVersion = '2.3.0.0'
   object WarningsListBox: TListBox
+    AnchorSideTop.Control = CreateLootpropsButton
+    AnchorSideTop.Side = asrBottom
     Left = 0
-    Height = 240
-    Top = 0
-    Width = 320
-    Align = alClient
+    Height = 309
+    Top = 217
+    Width = 376
+    Align = alBottom
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Top = 24
     ItemHeight = 0
     TabOrder = 0
   end
+  object SelectDirectoryButton: TButton
+    Left = 16
+    Height = 25
+    Top = 16
+    Width = 216
+    Caption = 'Select Equipments Directory…'
+    OnClick = SelectDirectoryButtonClick
+    TabOrder = 1
+  end
+  object ProbabilityInput: TFloatSpinEditEx
+    Left = 16
+    Height = 32
+    Top = 112
+    Width = 103
+    MaxLength = 0
+    TabOrder = 2
+    MaxValue = 100
+    Value = 10
+    Precision = 2
+  end
+  object SelectedDirectoryPathLabel: TLabel
+    AnchorSideTop.Control = SelectDirectoryButton
+    AnchorSideTop.Side = asrBottom
+    Left = 16
+    Height = 18
+    Top = 45
+    Width = 130
+    BorderSpacing.Top = 4
+    Caption = 'ChosenDirectoryPath'
+  end
+  object ProbabilityInputLabel: TLabel
+    AnchorSideBottom.Control = ProbabilityInput
+    Left = 16
+    Height = 18
+    Top = 90
+    Width = 95
+    Anchors = [akLeft, akBottom]
+    BorderSpacing.Bottom = 4
+    Caption = 'Probability in %'
+  end
+  object CreateLootpropsButton: TButton
+    AnchorSideTop.Side = asrBottom
+    Left = 16
+    Height = 25
+    Top = 168
+    Width = 216
+    Caption = 'Create Lootprops.ini'
+    OnClick = CreateLootpropsButtonClick
+    TabOrder = 3
+  end
   object SelectDirectoryDialog: TSelectDirectoryDialog
     Title = 'Select Freelancer EQUIPMENT directory'
-    Left = 148
+    Left = 248
     Top = 16
   end
-  object SaveDialog: TSaveDialog
+  object SaveLootpropsDialog: TSaveDialog
     Title = 'Save LootProps '
     FileName = 'LootProps.ini'
     Filter = '.ini'
     Options = [ofOverwritePrompt, ofEnableSizing, ofDontAddToRecent, ofViewDetail]
-    Left = 148
-    Top = 105
+    Left = 248
+    Top = 168
   end
 end
