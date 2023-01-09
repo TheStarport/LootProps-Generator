@@ -5,7 +5,7 @@ unit UMainForm;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Spin, SpinEx;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, SpinEx;
 
 type
   TMainForm = class(TForm)
@@ -39,11 +39,6 @@ uses
 
 type
   TStringsListArray = array of TStringList;
-
-  THpTypeChance = record
-    HpType: String;
-    Chance: Uint8;
-  end;
 
 var
   ValidSectionNames: array of String = ('commodity', 'repairkit', 'shieldbattery', 'munition', 'gun', 'mine', 'minedropper', 'countermeasure', 'countermeasuredropper', 'thruster', 'shieldgenerator', 'power', 'engine', 'scanner', 'tractor', 'cloakingdevice', 'armor');

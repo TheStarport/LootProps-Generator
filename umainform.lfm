@@ -1,12 +1,13 @@
 object MainForm: TMainForm
-  Left = 2170
+  Left = 300
   Height = 526
   Top = 250
-  Width = 376
+  Width = 390
   Caption = 'LootProp Maker'
   ClientHeight = 526
-  ClientWidth = 376
+  ClientWidth = 390
   OnCreate = FormCreate
+  Position = poDefault
   LCLVersion = '2.3.0.0'
   object WarningsListBox: TListBox
     AnchorSideTop.Control = CreateLootpropsButton
@@ -14,7 +15,7 @@ object MainForm: TMainForm
     Left = 0
     Height = 309
     Top = 217
-    Width = 376
+    Width = 390
     Align = alBottom
     Anchors = [akTop, akLeft, akRight, akBottom]
     BorderSpacing.Top = 24
@@ -32,7 +33,7 @@ object MainForm: TMainForm
   end
   object ProbabilityInput: TFloatSpinEditEx
     Left = 16
-    Height = 32
+    Height = 23
     Top = 112
     Width = 103
     MaxLength = 0
@@ -45,18 +46,18 @@ object MainForm: TMainForm
     AnchorSideTop.Control = SelectDirectoryButton
     AnchorSideTop.Side = asrBottom
     Left = 16
-    Height = 18
+    Height = 15
     Top = 45
-    Width = 130
+    Width = 112
     BorderSpacing.Top = 4
     Caption = 'ChosenDirectoryPath'
   end
   object ProbabilityInputLabel: TLabel
     AnchorSideBottom.Control = ProbabilityInput
     Left = 16
-    Height = 18
-    Top = 90
-    Width = 95
+    Height = 15
+    Top = 93
+    Width = 83
     Anchors = [akLeft, akBottom]
     BorderSpacing.Bottom = 4
     Caption = 'Probability in %'
